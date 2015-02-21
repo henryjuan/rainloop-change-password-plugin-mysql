@@ -175,7 +175,7 @@ class ChangePasswordMysqlDriver implements \RainLoop\Providers\ChangePassword\Ch
 		try
 		{
 			$conn = new PDO($dsn,$this->mUser,$this->mPass,$options);
-			$select = $conn->prepare("SELECT $this->mColumn FROM $this->mTable WHERE id = :id LIMIT 1");
+			$select = $conn->prepare("SELECT $this->mColumn FROM $this->mTable WHERE email = :id LIMIT 1");
 			$select->execute(array(
 				':id'     => $oAccount->Email()
 			));
@@ -185,10 +185,10 @@ class ChangePasswordMysqlDriver implements \RainLoop\Providers\ChangePassword\Ch
 
 			if (0 < strlen($sCryptPass) && crypt($sPrevPassword, $sCryptPass) === $sCryptPass && 7 < mb_strlen($sNewPassword) && 20 > mb_strlen($sNewPassword) && !preg_match('/[^A-Za-z0-9]+/', $sNewPassword))
 			{
-				$update = $conn->prepare("UPDATE $this->mTable SET $this->mColumn = :crypt WHERE id = :id");
+				$update = $conn->prepare("UPDATE $this->mTable SET $this->mColumn = :crypt WHERE email = :id");
 				$update->execute(array(
 					':id'    => $oAccount->Email(),
-					':crypt' => crypt($sNewPassword, '$'.md5(rand()))
+					':crypt' => crypt($sNewPassword, '$6$'.sha1(rand()))
 				));
 
 
